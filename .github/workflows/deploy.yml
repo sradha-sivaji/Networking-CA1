@@ -33,6 +33,12 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Force Re-creation of Server and Key
+        run: |
+          terraform taint tls_private_key.ssh_key
+          terraform taint aws_key_pair.generated_key
+          terraform taint aws_instance.web
+
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
