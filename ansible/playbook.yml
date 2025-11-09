@@ -3,6 +3,10 @@
   become: true
 
   tasks:
+    - name: Wait for SSH to be ready
+      local_action: wait_for port=22 host={{ inventory_hostname }}
+      become: false
+    
     - name: Update APT cache
       apt:
         update_cache: yes
