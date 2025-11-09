@@ -4,9 +4,12 @@
   gather_facts: no  # <-- FIX 1: Disable automatic fact gathering
 
   tasks:
-    - name: Wait for SSH to be ready
-      local_action: wait_for port=22 host={{ inventory_hostname }}
-      become: false
+    - name: Wait for cloud-init to complete
+      shell: "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 5; done"
+      register: cloud_init_wait
+      retries: 24 # Try for 2 minutes (24 retries * 5 seconds)
+      delay: 5
+      until: cloud_init_wait.rc == 0
     
     - name: Gather facts  # <-- FIX 1: Manually gather facts after waiting
       setup:
