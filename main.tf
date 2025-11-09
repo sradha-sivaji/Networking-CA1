@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "eu-central-1"
+  region = "eu-north-1"
 }
 
 resource "tls_private_key" "ssh_key" {
@@ -34,7 +34,7 @@ data "aws_subnet" "default" {
     values = [data.aws_vpc.default.id]
   }
 
-  availability_zone = "eu-central-1a"
+  availability_zone = "eu-north-1a"
 }
 
 resource "aws_security_group" "samplesite_sg" {
@@ -71,7 +71,7 @@ resource "aws_security_group" "samplesite_sg" {
 }
 
 resource "aws_instance" "web" {
-  ami                    = "ami-02003f9f0fde924ea" 
+  ami                    = "ami-07fb0a5bf9ae299a4" 
   instance_type          = "t2.micro"
   subnet_id              = data.aws_subnet.default.id
   key_name               = aws_key_pair.generated_key.key_name
