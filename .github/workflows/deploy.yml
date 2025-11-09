@@ -33,26 +33,23 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Force Re-creation of Server and Key
-        run: |
-          terraform taint tls_private_key.ssh_key
-          terraform taint aws_instance.web
-
       - name: Terraform Apply
         run: terraform apply -auto-approve
+
+      - name: Write SSH Private Key from Terraform Output
+        run: |
+          mkdir -p ~/.ssh
+          terraform output -raw private_key > ~/.ssh/key.pem
+          chmod 600 ~/.ssh/key.pem
 
       - name: EC2 IP from Terraform Output
         id: ec2ip
         run: |
           echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
           sleep 60
-          
-
-      - name: Set SSH Key Permissions
-        run: chmod 600 key.pem
 
       - name: Run Ansible Playbook
         run: |
           ansible-playbook -i "${{ env.EC2_IP }}," ansible/playbook.yml -u "ubuntu" \
-            --private-key key.pem \
+            --private-key ~/.ssh/key.pem \
             -e 'ansible_ssh_common_args="-o StrictHostKeyChecking=no"'

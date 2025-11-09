@@ -12,13 +12,6 @@ resource "aws_key_pair" "generated_key" {
   public_key = tls_private_key.ssh_key.public_key_openssh
 }
 
-resource "local_file" "private_key_file" {
-  content              = tls_private_key.ssh_key.private_key_pem
-  filename             = "${path.module}/key.pem"
-  file_permission      = "0400"
-  directory_permission = "0700"
-}
-
 data "aws_vpc" "default" {
   default = true
 }
@@ -87,3 +80,8 @@ output "public_ip" {
   value       = aws_instance.web.public_ip
 }
 
+output "private_key" {
+  description = "The private key for SSH"
+  value       = tls_private_key.ssh_key.private_key_pem
+  sensitive   = true 
+}
