@@ -39,6 +39,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: terraform apply -auto-approve
 
+      - name: Set up private key for Ansible
+        run: |
+          cp key.pem ansible_key.pem
+          chmod 400 ansible_key.pem
+
       - name: EC2 IP from Terraform Output
         id: ec2ip
         run: |
