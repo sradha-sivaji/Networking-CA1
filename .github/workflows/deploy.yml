@@ -33,6 +33,9 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Taint SSH key to force recreation
+        run: terraform taint tls_private_key.ssh_key
+
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
