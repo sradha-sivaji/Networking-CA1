@@ -20,7 +20,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1  # Correct region
+          aws-region: us-east-1
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -33,25 +33,17 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      # This forces a 100% clean rebuild of all parts
-      - name: Force Re-creation of Server and Key
-        run: |
-          terraform taint tls_private_key.ssh_key
-          terraform taint aws_key_pair.generated_key
-          terraform taint aws_instance.web
-
       - name: Terraform Apply
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: terraform apply -auto-approve
 
       - name: EC2 IP from Terraform Output
         id: ec2ip
         run: |
           echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
-          sleep 60  # IMPORTANT: Wait for server to boot
-
-      # This fixes the "UNPROTECTED KEY FILE" error
-      - name: Set SSH Key Permissions
-        run: chmod 600 key.pem
+          sleep 30 
 
       - name: Run Ansible Playbook
         run: |

@@ -1,26 +1,14 @@
 - name: Deploy Docker
   hosts: all
   become: true
-  gather_facts: no  # <-- IMPORTANT: Keeps this
 
   tasks:
-    # This task runs on the workflow machine, so it won't fail
-    - name: Wait for SSH port to be open
-      local_action: wait_for port=22 host={{ inventory_hostname }}
-      become: false
-
-    - name: Gather facts
-      setup: # <-- Manually gather facts AFTER the wait
-
     - name: Update APT cache
       apt:
         update_cache: yes
 
     - name: Install Docker
-      apt:
-        name: docker.io
-        state: present
-        update_cache: yes
+      shell: apt install docker.io -y
 
     - name: Ensure Docker service is started and enabled
       service:
@@ -45,19 +33,15 @@
         mode: '0644'
 
     - name: Build Docker image
-      become: true
       command: docker build -t samplesite /home/ubuntu/samplesite
       args:
         chdir: /home/ubuntu/samplesite
 
     - name: Stop existing container (if running)
-      become: true
       shell: docker stop samplesite || true
 
     - name: Remove existing container (if present)
-      become: true
       shell: docker rm samplesite || true
 
     - name: Run Docker container
-      become: true
       command: docker run -d --name samplesite -p 80:80 samplesite

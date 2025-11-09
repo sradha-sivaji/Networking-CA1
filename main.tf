@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "eu-north-1"
+  region = "eu-central-1"
 }
 
 resource "tls_private_key" "ssh_key" {
@@ -8,10 +8,10 @@ resource "tls_private_key" "ssh_key" {
 }
 
 resource "aws_key_pair" "generated_key" {
-  key_name   = "ca1-new"
+  key_name   = "ca1"
   public_key = tls_private_key.ssh_key.public_key_openssh
 }
-
+#demo
 resource "local_file" "private_key_file" {
   content              = tls_private_key.ssh_key.private_key_pem
   filename             = "${path.module}/key.pem"
@@ -34,7 +34,7 @@ data "aws_subnet" "default" {
     values = [data.aws_vpc.default.id]
   }
 
-  availability_zone = "eu-north-1a"
+  availability_zone = "eu-central-1a"
 }
 
 resource "aws_security_group" "samplesite_sg" {
@@ -71,8 +71,8 @@ resource "aws_security_group" "samplesite_sg" {
 }
 
 resource "aws_instance" "web" {
-  ami                    = "ami-07fb0a5bf9ae299a4" 
-  instance_type          = "t3.micro"
+  ami                    = "ami-02003f9f0fde924ea" 
+  instance_type          = "t2.micro"
   subnet_id              = data.aws_subnet.default.id
   key_name               = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.samplesite_sg.id]
@@ -86,4 +86,3 @@ output "public_ip" {
   description = "Public IP of the EC2 instance"
   value       = aws_instance.web.public_ip
 }
-
