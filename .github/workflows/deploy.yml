@@ -39,6 +39,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: terraform apply -auto-approve
 
+      - name: Refresh Terraform State
+        run: terraform refresh -no-color
+
       - name: Write SSH Private Key from Terraform Output
         run: |
           mkdir -p ~/.ssh
