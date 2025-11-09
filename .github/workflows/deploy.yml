@@ -34,7 +34,7 @@ jobs:
         run: terraform validate
 
       - name: Taint SSH key to force recreation
-        run: terraform taint tls_private_key.ssh_key
+        run: terraform taint aws_instance.web
 
       - name: Terraform Apply
         env:
