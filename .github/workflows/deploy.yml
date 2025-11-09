@@ -42,6 +42,9 @@ jobs:
           echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
           sleep 60
 
+      - name: Set SSH Key Permissions
+        run: chmod 600 key.pem
+
       - name: Run Ansible Playbook
         run: |
           ansible-playbook -i "${{ env.EC2_IP }}," ansible/playbook.yml -u "ubuntu" \
