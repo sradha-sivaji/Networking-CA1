@@ -41,15 +41,15 @@ jobs:
 
       - name: Write SSH Private Key from Terraform Output
         run: |
-          terraform output -raw private_key > key.pem
-          chmod 600 key.pem
-
-      - name: Write SSH Private Key from Terraform Output
-        run: |
           mkdir -p ~/.ssh
           terraform output -raw private_key > ~/.ssh/key.pem
           chmod 600 ~/.ssh/key.pem
 
+      - name: EC2 IP from Terraform Output
+        id: ec2ip
+        run: |
+          echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+          sleep 60
 
       - name: Run Ansible Playbook
         run: |
