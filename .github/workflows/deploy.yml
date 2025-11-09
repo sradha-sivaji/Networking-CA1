@@ -39,6 +39,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: terraform apply -auto-approve
 
+      - name: Write SSH Private Key from Terraform Output
+        run: |
+          terraform output -raw private_key > key.pem
+          chmod 600 key.pem
+
       - name: EC2 IP from Terraform Output
         id: ec2ip
         run: |
