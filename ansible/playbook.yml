@@ -1,18 +1,24 @@
 - name: Deploy Docker
   hosts: all
   become: true
+  gather_facts: no  # <-- FIX 1: Disable automatic fact gathering
 
   tasks:
     - name: Wait for SSH to be ready
       local_action: wait_for port=22 host={{ inventory_hostname }}
       become: false
     
+    - name: Gather facts  # <-- FIX 1: Manually gather facts after waiting
+      setup:
+
     - name: Update APT cache
       apt:
         update_cache: yes
 
     - name: Install Docker
-      shell: apt install docker.io -y
+      apt: # <-- This is a more reliable way to install
+        name: docker.io
+        state: present
 
     - name: Ensure Docker service is started and enabled
       service:
@@ -30,22 +36,26 @@
 
     - name: Copy application files to EC2
       copy:
-        src: ../samplesite/
+        src: ../samplesite/  # Make sure this 'samplesite' folder exists in your repo
         dest: /home/ubuntu/samplesite/
         owner: ubuntu
         group: ubuntu
         mode: '0644'
 
     - name: Build Docker image
+      become: true  # <-- FIX 2: Add 'become'
       command: docker build -t samplesite /home/ubuntu/samplesite
       args:
         chdir: /home/ubuntu/samplesite
 
     - name: Stop existing container (if running)
+      become: true  # <-- FIX 2: Add 'become'
       shell: docker stop samplesite || true
 
     - name: Remove existing container (if present)
+      become: true  # <-- FIX 2: Add 'become'
       shell: docker rm samplesite || true
 
     - name: Run Docker container
+      become: true  # <-- FIX 2: Add 'become'
       command: docker run -d --name samplesite -p 80:80 samplesite
