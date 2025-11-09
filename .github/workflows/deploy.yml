@@ -20,7 +20,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
+          aws-region: eu-north-1  # Correct region
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -34,13 +34,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Apply
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: terraform apply -auto-approve
-
-      - name: Refresh Terraform State
-        run: terraform refresh -no-color
 
       - name: Write SSH Private Key from Terraform Output
         run: |
@@ -57,5 +51,5 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           ansible-playbook -i "${{ env.EC2_IP }}," ansible/playbook.yml -u "ubuntu" \
-          --private-key ~/.ssh/key.pem \
-          -e 'ansible_ssh_common_args="-o StrictHostKeyChecking=no"'
+            --private-key ~/.ssh/key.pem \
+            -e 'ansible_ssh_common_args="-o StrictHostKeyChecking=no"'
