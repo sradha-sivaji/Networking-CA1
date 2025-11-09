@@ -72,7 +72,7 @@ resource "aws_security_group" "samplesite_sg" {
 
 resource "aws_instance" "web" {
   ami                    = "ami-07fb0a5bf9ae299a4" 
-  instance_type          = "t2.micro"
+  instance_type          = "t3.micro"
   subnet_id              = data.aws_subnet.default.id
   key_name               = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.samplesite_sg.id]
