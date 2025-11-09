@@ -36,12 +36,6 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
-      - name: Write SSH Private Key from Terraform Output
-        run: |
-          mkdir -p ~/.ssh
-          terraform output -raw private_key > ~/.ssh/key.pem
-          chmod 600 ~/.ssh/key.pem
-
       - name: EC2 IP from Terraform Output
         id: ec2ip
         run: |
@@ -51,5 +45,5 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           ansible-playbook -i "${{ env.EC2_IP }}," ansible/playbook.yml -u "ubuntu" \
-            --private-key ~/.ssh/key.pem \
+            --private-key key.pem \
             -e 'ansible_ssh_common_args="-o StrictHostKeyChecking=no"'
